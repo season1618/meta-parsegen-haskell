@@ -8,6 +8,7 @@ module Lib (
 ) where
 
 import GHC.Generics
+import Data.Char
 
 class Parser a where
     parse :: String -> Maybe (a, String)
@@ -47,3 +48,10 @@ instance Parser' f => Parser' (M1 i t f) where
     parse' s = do
         (res, t) <- parse' s
         return (M1 res, t)
+
+instance Parser Int where
+    parse s@(c:_) | isDigit c = parseInt 0 s where
+        parseInt :: Int -> String -> Maybe (Int, String)
+        parseInt v (c:cs) | isDigit c = parseInt (10 * v + digitToInt c) cs
+        parseInt v s = Just (v, s)
+    parse _ = Nothing
