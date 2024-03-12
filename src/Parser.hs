@@ -2,13 +2,20 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE FlexibleContexts #-}
 
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE KindSignatures #-}
+
 module Parser (
     Parser,
     parse,
+    StrLit,
 ) where
 
 import GHC.Generics
+import GHC.TypeLits
 import Data.Char
+import Data.Proxy
 
 class Parser a where
     parse :: String -> Maybe (a, String)
@@ -55,3 +62,15 @@ instance Parser Int where
         parseInt v (c:cs) | isDigit c = parseInt (10 * v + digitToInt c) cs
         parseInt v s = Just (v, s)
     parse _ = Nothing
+
+data StrLit (s :: Symbol) = StrLit
+
+instance KnownSymbol t => Show (StrLit t) where
+    show s = (symbolVal (Proxy :: Proxy t))
+
+instance KnownSymbol t => Parser (StrLit t) where
+    parse s = parseStrLit s (symbolVal (Proxy :: Proxy t)) where
+        parseStrLit :: String -> String -> Maybe (StrLit t, String)
+        parseStrLit (c:cs) (d:ds) | c == d = parseStrLit cs ds
+        parseStrLit s "" = Just (StrLit, s)
+        parseStrLit _ _ = Nothing
