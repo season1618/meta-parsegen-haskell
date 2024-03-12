@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
 
-import Lib
+import Parser
 import GHC.Generics
 
 data Expr = Add Int Plus Expr
