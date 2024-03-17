@@ -7,10 +7,10 @@ import Parser
 import GHC.Generics
 import Data.Char
 
-data Expr = Expr Term [HOr [HList [StrLit "+", Term], HList [StrLit "-", Term]]]
+data Expr = Expr Term [HOr [HCon [StrLit "+", Term], HCon [StrLit "-", Term]]]
     deriving (Show, Generic, Parser)
 
-data Term = Term Fact [HOr [HList [StrLit "*", Fact], HList [StrLit "/", Fact]]]
+data Term = Term Fact [HOr [HCon [StrLit "*", Fact], HCon [StrLit "/", Fact]]]
     deriving (Show, Generic, Parser)
 
 data Fact = ParenExpr (StrLit "(") Expr (StrLit ")")

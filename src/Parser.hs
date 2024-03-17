@@ -16,7 +16,7 @@ module Parser (
     Parser,
     parse,
     StrLit,
-    HList,
+    HCon,
     HOr,
 ) where
 
@@ -84,20 +84,20 @@ instance KnownSymbol t => Parser (StrLit t) where
         parseStrLit s "" = Just (StrLit, s)
         parseStrLit _ _ = Nothing
 
-data HList (as :: [Type]) where
-    HNil :: HList '[]
-    HCons :: a -> HList as -> HList (a ': as)
+data HCon (as :: [Type]) where
+    HNil :: HCon '[]
+    HCons :: a -> HCon as -> HCon (a ': as)
 
-instance Show (HList '[]) where
+instance Show (HCon '[]) where
     show _ = "[]"
 
-instance (Show a, Show (HList as)) => Show (HList (a ': as)) where
+instance (Show a, Show (HCon as)) => Show (HCon (a ': as)) where
     show (HCons x xs) = "[" ++ show x ++ ", " ++ tail (show xs)
 
-instance Parser (HList '[]) where
+instance Parser (HCon '[]) where
     parse s = Just (HNil, s)
 
-instance (Parser a, Parser (HList as)) => Parser (HList (a ': as)) where
+instance (Parser a, Parser (HCon as)) => Parser (HCon (a ': as)) where
     parse s = do
         (x, s1) <- parse s :: Maybe (a, String)
         (xs, s2) <- parse s1
