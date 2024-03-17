@@ -17,6 +17,7 @@ module Parser (
     parse,
     StrLit,
     HList,
+    HOr,
 ) where
 
 import GHC.Generics
@@ -101,6 +102,27 @@ instance (Parser a, Parser (HList as)) => Parser (HList (a ': as)) where
         (x, s1) <- parse s :: Maybe (a, String)
         (xs, s2) <- parse s1
         return (HCons x xs, s2)
+
+data HOr (as :: [Type]) where
+    Head :: a -> HOr (a ': as)
+    Tail :: HOr as -> HOr (a ': as)
+
+instance Show (HOr '[]) where
+    show _ = "Nothing"
+
+instance (Show a, Show (HOr as)) => Show (HOr (a ': as)) where
+    show (Head x) = show x
+    show (Tail x) = show x
+
+instance Parser (HOr '[]) where
+    parse s = Nothing
+
+instance (Parser a, Parser (HOr as)) => Parser (HOr (a ': as)) where
+    parse s = disjunct (parse s) (parse s) where
+        disjunct :: Maybe (a, String) -> Maybe (HOr as, String) -> Maybe (HOr (a ': as), String)
+        disjunct (Just (res, s)) _ = Just (Head res, s)
+        disjunct _ (Just (res, s)) = Just (Tail res, s)
+        disjunct _ _ = Nothing
 
 instance Parser a => Parser (Maybe a) where
     parse s = case parse s of
