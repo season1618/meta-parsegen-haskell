@@ -106,3 +106,10 @@ instance Parser a => Parser (Maybe a) where
     parse s = case parse s of
         Just (res, s') -> Just (Just res, s')
         Nothing -> Just (Nothing, s)
+
+instance Parser a => Parser [a] where
+    parse s = parseList [] s where
+        parseList :: [a] -> String -> Maybe ([a], String)
+        parseList v s = case parse s of
+            Just (res, s') -> parseList (v ++ [res]) s'
+            Nothing -> Just (v, s)

@@ -7,15 +7,13 @@ import Parser
 import GHC.Generics
 import Data.Char
 
-data Expr = Add Term (HList [(StrLit "+"), Expr])
-          | Term Term
+data Expr = Expr Term [HList [(StrLit "+"), Term]]
     deriving (Show, Generic, Parser)
 
-data Term = Mul Fact (HList [(StrLit "*"), Term])
-          | Fact Fact
+data Term = Term Fact [HList [(StrLit "*"), Fact]]
     deriving (Show, Generic, Parser)
 
-data Fact = Expr (StrLit "(") Expr (StrLit ")")
+data Fact = ParenExpr (StrLit "(") Expr (StrLit ")")
           | Num Int
           | Var Letters (Maybe (StrLit "[]"))
     deriving (Show, Generic, Parser)
