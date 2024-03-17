@@ -7,13 +7,11 @@ import Parser
 import GHC.Generics
 import Data.Char
 
-data Expr = Add Term (StrLit "+") Expr
-          | Sub Term (StrLit "-") Expr
+data Expr = Add Term (HList [(StrLit "+"), Expr])
           | Term Term
     deriving (Show, Generic, Parser)
 
-data Term = Mul Fact (StrLit "*") Term
-          | Div Fact (StrLit "/") Term
+data Term = Mul Fact (HList [(StrLit "*"), Term])
           | Fact Fact
     deriving (Show, Generic, Parser)
 
@@ -33,7 +31,7 @@ instance Parser Letters where
 
 main :: IO ()
 main = do
-    print $ (parse "1+2-3" :: Maybe (Expr, String))
-    print $ (parse "4/5*6" :: Maybe (Expr, String))
-    print $ (parse "(1+2)*(3/4)-5" :: Maybe (Expr, String))
-    print $ (parse "abc/(xyz[]+1-2)" :: Maybe (Expr, String))
+    print $ (parse "1+2+3+4+5" :: Maybe (Expr, String))
+    print $ (parse "4*5*6*7*8" :: Maybe (Expr, String))
+    print $ (parse "(1+2)*(3*4)+5" :: Maybe (Expr, String))
+    print $ (parse "abc*(xyz[]+1+2)" :: Maybe (Expr, String))

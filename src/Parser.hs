@@ -6,16 +6,24 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE KindSignatures #-}
 
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 module Parser (
     Parser,
     parse,
     StrLit,
+    HList,
 ) where
 
 import GHC.Generics
 import GHC.TypeLits
 import Data.Char
 import Data.Proxy
+import Data.Kind
 
 class Parser a where
     parse :: String -> Maybe (a, String)
@@ -74,6 +82,25 @@ instance KnownSymbol t => Parser (StrLit t) where
         parseStrLit (c:cs) (d:ds) | c == d = parseStrLit cs ds
         parseStrLit s "" = Just (StrLit, s)
         parseStrLit _ _ = Nothing
+
+data HList (as :: [Type]) where
+    HNil :: HList '[]
+    HCons :: a -> HList as -> HList (a ': as)
+
+instance Show (HList '[]) where
+    show _ = "[]"
+
+instance (Show a, Show (HList as)) => Show (HList (a ': as)) where
+    show (HCons x xs) = "[" ++ show x ++ ", " ++ tail (show xs)
+
+instance Parser (HList '[]) where
+    parse s = Just (HNil, s)
+
+instance (Parser a, Parser (HList as)) => Parser (HList (a ': as)) where
+    parse s = do
+        (x, s1) <- parse s :: Maybe (a, String)
+        (xs, s2) <- parse s1
+        return (HCons x xs, s2)
 
 instance Parser a => Parser (Maybe a) where
     parse s = case parse s of
