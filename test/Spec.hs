@@ -31,5 +31,5 @@ main :: IO ()
 main = do
     print $ (parse "1+2-3+4-5" :: Maybe (Expr, String))
     print $ (parse "4/5*6/7*8" :: Maybe (Expr, String))
-    print $ (parse "(1+2)*(3*4)+5" :: Maybe (Expr, String))
-    print $ (parse "abc*(xyz[]+1+2)" :: Maybe (Expr, String))
+    print $ (parse "(1+2)*(3/4)-5" :: Maybe (Expr, String))
+    print $ (parse "abc/(xyz[]-1+2)" :: Maybe (Expr, String))

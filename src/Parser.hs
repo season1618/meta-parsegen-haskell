@@ -8,9 +8,6 @@
 
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE UndecidableInstances #-}
 
 module Parser (
     Parser,
@@ -75,7 +72,7 @@ instance Parser Int where
 data StrLit (s :: Symbol) = StrLit
 
 instance KnownSymbol t => Show (StrLit t) where
-    show s = (symbolVal (Proxy :: Proxy t))
+    show _ = (symbolVal (Proxy :: Proxy t))
 
 instance KnownSymbol t => Parser (StrLit t) where
     parse s = parseStrLit s (symbolVal (Proxy :: Proxy t)) where
@@ -99,7 +96,7 @@ instance Parser (HCon '[]) where
 
 instance (Parser a, Parser (HCon as)) => Parser (HCon (a ': as)) where
     parse s = do
-        (x, s1) <- parse s :: Maybe (a, String)
+        (x, s1) <- parse s
         (xs, s2) <- parse s1
         return (HCons x xs, s2)
 
@@ -115,7 +112,7 @@ instance (Show a, Show (HOr as)) => Show (HOr (a ': as)) where
     show (Tail x) = show x
 
 instance Parser (HOr '[]) where
-    parse s = Nothing
+    parse _ = Nothing
 
 instance (Parser a, Parser (HOr as)) => Parser (HOr (a ': as)) where
     parse s = disjunct (parse s) (parse s) where
