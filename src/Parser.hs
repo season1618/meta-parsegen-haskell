@@ -74,3 +74,8 @@ instance KnownSymbol t => Parser (StrLit t) where
         parseStrLit (c:cs) (d:ds) | c == d = parseStrLit cs ds
         parseStrLit s "" = Just (StrLit, s)
         parseStrLit _ _ = Nothing
+
+instance Parser a => Parser (Maybe a) where
+    parse s = case parse s of
+        Just (res, s') -> Just (Just res, s')
+        Nothing -> Just (Nothing, s)

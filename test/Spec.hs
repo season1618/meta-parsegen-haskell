@@ -19,7 +19,7 @@ data Term = Mul Fact (StrLit "*") Term
 
 data Fact = Expr (StrLit "(") Expr (StrLit ")")
           | Num Int
-          | Var Letters
+          | Var Letters (Maybe (StrLit "[]"))
     deriving (Show, Generic, Parser)
 
 data Letters = Letters String
@@ -36,4 +36,4 @@ main = do
     print $ (parse "1+2-3" :: Maybe (Expr, String))
     print $ (parse "4/5*6" :: Maybe (Expr, String))
     print $ (parse "(1+2)*(3/4)-5" :: Maybe (Expr, String))
-    print $ (parse "abc/(xyz+1-2)" :: Maybe (Expr, String))
+    print $ (parse "abc/(xyz[]+1-2)" :: Maybe (Expr, String))
