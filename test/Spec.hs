@@ -18,6 +18,11 @@ data Fact = ParenExpr (StrLit "(") Expr (StrLit ")")
           | Var Letters (Maybe (StrLit "[]"))
     deriving (Show, Generic, Parser)
 
+data Prim' = ParenExpr' (StrLit "(") Expr' (StrLit ")")
+           | Num' Int
+    deriving (Show, Generic, Parser)
+type Expr' = AutoExpr [ HOr [StrLit "+", StrLit "-"], HOr [StrLit "*", StrLit "/"] ] Prim'
+
 data Letters = Letters String
     deriving (Show, Generic)
 
@@ -33,3 +38,5 @@ main = do
     print $ (parse "4/5*6/7*8" :: Maybe (Expr, String))
     print $ (parse "(1+2)*(3/4)-5" :: Maybe (Expr, String))
     print $ (parse "abc/(xyz[]-1+2)" :: Maybe (Expr, String))
+    print $ (parse "1+2*3/(4-5*6)+7" :: Maybe (Expr', String))
+    print $ (parse "1*2*3+4-5-6/7" :: Maybe (Expr', String))
