@@ -24,6 +24,8 @@ source-repository head
 
 library
   exposed-modules:
+      AutoExpr
+      Grammar
       Parser
   other-modules:
       Paths_meta_parsegen

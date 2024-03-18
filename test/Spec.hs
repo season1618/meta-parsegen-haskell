@@ -4,6 +4,8 @@
 {-# LANGUAGE DataKinds #-}
 
 import Parser
+import Grammar
+import AutoExpr
 import GHC.Generics
 import Data.Char
 
