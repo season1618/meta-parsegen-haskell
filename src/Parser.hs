@@ -34,11 +34,11 @@ instance Parser' U1 where
     parse' s = Just (U1, s)
 
 instance (Parser' f, Parser' g) => Parser' (f :+: g) where
-    parse' s = case parse' s of
-        Just (res1, s1) -> Just (L1 res1, s1)
-        Nothing -> case parse' s of
-            Just (res2, s2) -> Just (R1 res2, s2)
-            Nothing -> Nothing
+    parse' s = join (parse' s) (parse' s) where
+        join :: Maybe (f p, String) -> Maybe (g p, String) -> Maybe ((f :+: g) p, String)
+        join (Just (res, s')) _ = Just (L1 res, s')
+        join _ (Just (res, s')) = Just (R1 res, s')
+        join _ _ = Nothing
 
 instance (Parser' f, Parser' g) => Parser' (f :*: g) where
     parse' s = do
