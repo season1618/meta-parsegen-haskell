@@ -48,11 +48,11 @@ instance Parser (HOr '[]) where
     parse _ = Nothing
 
 instance (Parser a, Parser (HOr as)) => Parser (HOr (a ': as)) where
-    parse s = disjunct (parse s) (parse s) where
-        disjunct :: Maybe (a, String) -> Maybe (HOr as, String) -> Maybe (HOr (a ': as), String)
-        disjunct (Just (res, s)) _ = Just (Head res, s)
-        disjunct _ (Just (res, s)) = Just (Tail res, s)
-        disjunct _ _ = Nothing
+    parse s = join (parse s) (parse s) where
+        join :: Maybe (a, String) -> Maybe (HOr as, String) -> Maybe (HOr (a ': as), String)
+        join (Just (res, s)) _ = Just (Head res, s)
+        join _ (Just (res, s)) = Just (Tail res, s)
+        join _ _ = Nothing
 
 instance Parser a => Parser (Maybe a) where
     parse s = case parse s of
